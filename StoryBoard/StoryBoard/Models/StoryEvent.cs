@@ -17,6 +17,7 @@ namespace StoryBoard.Models
         public string EventDescription { get; set; }
         public bool? IsCompleted { get; set; }
         public DateTime? CompletedDate { get; set; }
+        public int? Precedence { get; set; }
 
         public virtual ICollection<QuestEvent> QuestEvent { get; set; }
         public virtual ICollection<StoryEventCharacter> StoryEventCharacter { get; set; }
