@@ -4,27 +4,22 @@ create table character_type (
 	isNPC bit
 );
 
-create table story_character (
+create table alignment_lookup (
 	id INT IDENTITY(1,1) PRIMARY KEY,
-	icon VARBINARY(MAX),
-	gender varchar(255),
-	backstory varchar(MAX),
-	characterType INT FOREIGN KEY REFERENCES character_type(id) NOT NULL,
-	CR INT default 0
+	displayText varchar(255),
+	shortText varchar(2)
 );
 
-create table relationship_type_lookup (
-	id INT IDENTITY(1,1) PRIMARY KEY,
-	relationshipDesciption varchar(255),
-	reputationThreshold INT NOT NULL,
-);
+INSERT INTO alignment_lookup
+VALUES ('Lawful Good', 'LG'), ('Neurtal Good', 'NG'), ('Chaotic Good', 'CG'),
+	('Lawful Neutral', 'LN'), ('True Neutral', 'N'), ('Chaotic Neutral', 'CN'),
+	('Lawful Evil', 'LE'), ('Neurtal Evil', 'NE'), ('Chaotic Evil', 'CE');
 
-create table relationship (
+create table organization (
 	id INT IDENTITY(1,1) PRIMARY KEY,
-	relationshipType INT FOREIGN KEY REFERENCES relationship_type_lookup(id) NOT NULL,
-	reputation INT default 0,
-	fromCharacter INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
-	toCharacter INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
+	organizationName varchar(255),
+	organizationDescription varchar(MAX),
+	alignment INT FOREIGN KEY REFERENCES alignment_lookup(id) NOT NULL,
 );
 
 create table location_type_lookup (
@@ -40,6 +35,32 @@ create table story_location (
 	coordinatesX float not null,
 	coordinatesY float not null,
 	containedIn INT FOREIGN KEY REFERENCES story_location(id),
+	associatedOrganization INT FOREIGN KEY REFERENCES organization(id)
+);
+
+create table story_character (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	icon VARBINARY(MAX),
+	gender varchar(255),
+	backstory varchar(MAX),
+	characterType INT FOREIGN KEY REFERENCES character_type(id) NOT NULL,
+	characterName varchar(255) not null,
+	characterLocation INT FOREIGN KEY REFERENCES story_location(id) NOT NULL, 
+	CR INT default 0
+);
+
+create table relationship_type_lookup (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	relationshipDesciption varchar(255),
+	reputationThreshold INT NOT NULL,
+);
+
+create table relationship (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	relationshipType INT FOREIGN KEY REFERENCES relationship_type_lookup(id) NOT NULL,
+	reputation INT default 0,
+	fromCharacter INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
+	toCharacter INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
 );
 
 create table item (
@@ -90,6 +111,7 @@ create table quest (
 	questDescription varchar(MAX) DEFAULT '',
 	hook varchar(280) default '' /*If you cant make it sound good as a tweet, I dont want to do your quest*/,
 	title varchar(255) not null,
+	startLocation INT FOREIGN KEY REFERENCES story_location(id) NOT NULL,
 	CR int not null
 ); 
 
@@ -105,3 +127,16 @@ create table quest_reward (
 	questId INT FOREIGN KEY REFERENCES quest(id) NOT NULL,
 	quantity INT DEFAULT 1 NOT NULL
 ); 
+
+create table organization_rank(
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	rankDesciption varchar(255),
+	reputationThreshold INT NOT NULL
+);
+
+create table organization_member (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	organizationId INT FOREIGN KEY REFERENCES organization(id) NOT NULL,
+	characterId INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
+	currentRank INT FOREIGN KEY REFERENCES organization_rank(id) NOT NULL
+);
