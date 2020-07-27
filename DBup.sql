@@ -73,7 +73,8 @@ create table story_event (
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	eventDescription varchar(MAX) default '',
 	isCompleted bit,
-	completedDate DATETIME
+	completedDate DATETIME,
+	precedence INT default 0
 );
 
 create table story_event_item (
@@ -112,6 +113,8 @@ create table quest (
 	hook varchar(280) default '' /*If you cant make it sound good as a tweet, I dont want to do your quest*/,
 	title varchar(255) not null,
 	startLocation INT FOREIGN KEY REFERENCES story_location(id) NOT NULL,
+	organization INT FOREIGN KEY REFERENCES organization(id),
+	prequelId INT FOREIGN KEY REFERENCES quest(id),
 	CR int not null
 ); 
 
@@ -140,3 +143,27 @@ create table organization_member (
 	characterId INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
 	currentRank INT FOREIGN KEY REFERENCES organization_rank(id) NOT NULL
 );
+
+create table character_to_org_relationship (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	organizationId INT FOREIGN KEY REFERENCES organization(id) NOT NULL,
+	characterId INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
+	relationshipType INT FOREIGN KEY REFERENCES relationship_type_lookup(id) NOT NULL,
+	reputation INT default 0,
+)
+
+create table org_to_character_relationship (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	organizationId INT FOREIGN KEY REFERENCES organization(id) NOT NULL,
+	characterId INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
+	relationshipType INT FOREIGN KEY REFERENCES relationship_type_lookup(id) NOT NULL,
+	reputation INT default 0,
+)
+
+create table org_to_org_relationship (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	organizationId INT FOREIGN KEY REFERENCES organization(id) NOT NULL,
+	characterId INT FOREIGN KEY REFERENCES story_character(id) NOT NULL,
+	relationshipType INT FOREIGN KEY REFERENCES relationship_type_lookup(id) NOT NULL,
+	reputation INT default 0,
+)

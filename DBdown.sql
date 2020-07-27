@@ -1,3 +1,6 @@
+drop table character_to_org_relationship 
+drop table org_to_character_relationship 
+drop table org_to_org_relationship 
 drop table organization_member 
 drop table organization_rank 
 drop table quest_reward  
